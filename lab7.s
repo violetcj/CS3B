@@ -1,15 +1,16 @@
 .data
-testCase: 	.byte		1
-scrPr:		.asciz		"DEFAULT CASE"
+default:		.asciz		"DEFAULT CASE\n"
+one:			.asciz		"1\n"
+two:			.asciz		"2\n"
+testValue: 		.byte		1
 
 .global _start
 .text
 
 _start:
-	LDR 	X0, =testCase	//XO = &testCase
-	LDR 	X0, [X0]	//DEREFERENCING XO AND STORING VALUE IN X0 
-
-	LDR 	X1, =scrPr	//X1 = &scrPr
+	LDR 	X0, =testValue  //X0 = &testValue
+	LDRB 	W0, [X0]	//loading one byte of actual value into W0(X0)
+	LDR 	X1, =default	//X1 = &default
 	CMP	X0, #1		//COMPARING VALUE OF X0 TO 1
 	B.EQ	ifOne		//JUMPS TO LABEL ifOne IF COMPARION ABOVE IS EQUAL
 
@@ -19,29 +20,28 @@ _start:
 	B	ifNeither	//BRANCHES TO LABEL ifNeither
 
 ifOne:
-	MOV	X1, #1		//REPLACES X1 VALUE WITH 1
-
+	LDR	X1, =one	//LOADS one LABEL INTO X1
 	B	putch		//BRANCHES TO LABEL putch
 
 ifTwo:
-	MOV 	X1, #2		//REPLACES X1 VALUE WITH 2
+	LDR 	X1, =two	//LOADS two LABEL INTO X1
 	B	putch		//BRANCHES TO LABEL putch
 
 ifNeither:
-	MOV	X0, #1
-	MOV	X2, #13
-	MOV	X8, #64
-	svc	0
-	B	exit
+	MOV	X0, #1		//StdOut
+	MOV	X2, #13		//LENGTH OF STRING
+	MOV	X8, #64		//LINUX WRITE SYSTEM CALL
+	svc	0		//CALL LINUX TO OUTPUT
+	B	exit		//BRANCH TO exit LABEL
 
 putch:
-	MOV 	X0, #1
-	MOV	X2, #2
-	MOV	X8, #64
-	svc	0
-	B	exit
+	MOV 	X0, #1		//StdOut
+	MOV	X2, #2		//LENGTH OF STRING 
+	MOV	X8, #64		//LINUX WRITE SYSTEM CALL
+	svc	0		//CALL LINUX TO OUTPUT 
+	B	exit		//BRANCH TO exit LABEL
 
 exit:
-	MOV	X0, #0
-	MOV 	X8, #93
-	svc	0
+	MOV	X0, #0		//0 RETURN CODE
+	MOV 	X8, #93		//SERVICE CODE 93 TERMINATES 
+	svc	0		//CALL LINUX TO TERMINATE PROGRAM
