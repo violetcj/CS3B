@@ -2,7 +2,7 @@
 default:		.asciz		"DEFAULT CASE\n"
 one:			.asciz		"1\n"
 two:			.asciz		"2\n"
-testValue: 		.byte		1
+testValue: 		.byte		3
 
 .global _start
 .text
