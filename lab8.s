@@ -1,5 +1,5 @@
 .data
-chStr: 	.asciz	"CJ Carroll"
+chStr: 	.asciz	"CJ Carroll\n"
 
 .global _start 
 .text 
