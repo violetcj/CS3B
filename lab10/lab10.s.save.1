@@ -1,0 +1,86 @@
+.data
+getXpr:	 .asciz		"Enter x: "
+getYpr:	 .asciz		"Enter y: "
+szPlus:	 .asciz 	" + "
+szEqual: .asciz		" = "
+prAX: 	 .asciz		"&x"
+prAY:	 .asciz		"&y"
+szXin:	 .skip		19		//Stores X input from user
+szYin:	 .skip		19		//Stores Y input from user
+szSum:	 .skip		19		//stores hexstring version of sum
+szAX:	 .skip		19		//should store memory address as a string of qX
+szAY:	 .skip		19		//should store memory address as a string of qY
+qX:	 .quad		0		//integer version of szXin
+qY:	 .quad		0		//integer version of szYin
+qSum:	 .quad		0		//stores sum of qX and qY
+chNline	 .byte		10		//stores newline 
+
+
+.global _start
+.text
+
+_start:
+
+	LDR	X1, =szXin
+
+
+//getstring: will read a string of characters terminated by a null and stores it within the address of X1
+
+//X1: Points to the first byte of buffer to receive the string
+//X2: The length of the string buffer
+//LR: Contains return address
+
+//Returned Register contents:
+//X0: Will return the # of bytes read
+//All AAPCS mandated registers are preserved
+
+getstring:
+	//Preserve registers X19-X30 by pushing onto stack
+	STR	X19,[SP, #-16]!		//X19 onto stack
+        STR     X20,[SP, #-16]!         //X20 onto stack
+        STR     X21,[SP, #-16]!         //X21 onto stack
+        STR     X22,[SP, #-16]!         //X22 onto stack
+        STR     X23,[SP, #-16]!         //X23 onto stack
+        STR     X24,[SP, #-16]!         //X24 onto stack
+        STR     X25,[SP, #-16]!         //X25 onto stack
+        STR     X26,[SP, #-16]!         //X26 onto stack
+        STR     X27,[SP, #-16]!         //X27 onto stack
+        STR     X28,[SP, #-16]!         //X28 onto stack
+        STR     X29,[SP, #-16]!         //X29 onto stack
+        STR     X30,[SP, #-16]!         //LR onto stack
+
+	//Setting up system call
+	MOV 	X0, #0	//0 = StdIn
+	MOV 	X8, #63	//Linux read system call
+	SVC 	0	//Calls linux
+
+	//system call will keep reading until a \n is typed
+	SUBS	X0, X0, #1	//Sets address pointed to by X0 to be one less than
+				//its current length in order to access the memory address
+				//with the string's newline character
+	LDRB	W8, [X1, X0]	//Loads W8 with the byte containing the '\n' character
+	CMP	W8, #'\n'	//Compares the contents of W8 with ascii for '\n'
+	BEQ	getstringend	//conditional jump to end of function if the value is
+				//'\n'
+	ADD	X0, X0, #1	//If the previous jump fails, adjust by adding 1 to X0
+
+getstringend:
+	MOV	W3, #0		//stores the null terminating character ascii value in X3
+	STRB	W3, [X1, X0]	//stores null character in the memory address currently being
+				//pointed to by X1 with an offset of X0
+
+	//Popping registers off the stack
+	LDR	X30, [SP], #16	//Pops LR
+	LDR     X29, [SP], #16  //Pops X29
+	LDR     X28, [SP], #16  //Pops X28
+	LDR     X27, [SP], #16  //Pops X27
+	LDR     X26, [SP], #16  //Pops X26
+	LDR     X25, [SP], #16  //Pops X25
+	LDR     X24, [SP], #16  //Pops X24
+	LDR     X23, [SP], #16  //Pops X23
+	LDR     X22, [SP], #16  //Pops X22
+	LDR     X21, [SP], #16  //Pops X21
+	LDR     X20, [SP], #16  //Pops X20
+	LDR     X19, [SP], #16  //Pops X19
+
+	RET 	LR	//Return
