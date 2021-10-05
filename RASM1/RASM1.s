@@ -12,10 +12,17 @@ szBp:		.asciz		" )"
 szPlus:		.asciz		" + "
 szMinus:	.asciz		" - "
 szEqual:	.asciz		" = "
+szSpace:	.asciz		"  "
+szAddyPr:	.asciz		"The addresses of the 4 ints: "
 szAin:		.skip		19
 szBin:		.skip		19
 szCin:		.skip		19
 szDin:		.skip		19
+szTotal:	.skip		19
+szAa:		.skip		19
+szAb:		.skip		19
+szAc:		.skip		19
+szAd:		.skip		19
 qA:		.quad		0
 qB:		.quad		0
 qC:		.quad		0
@@ -52,8 +59,6 @@ _start:
 	BL	putstring	//execute newline
 	LDR	X0, =chCr	//reload X0
 	BL	putstring	//execute newline once more
-        LDR     X0, =chCr       //reload X0
-        BL      putstring       //execute newline once more
 
 	//GETTING INPUT A
 	LDR 	X0, =szPr	//X0 = &szPr
@@ -150,6 +155,76 @@ _start:
 	LDR	X22, =qD	//X22 = &qD
 	STR	X0, [X22]	//*X22 = X0
 
+
+	//SUM OF A AND B
+	LDR	X3, [X19]	//X3 = *X19
+	LDR	X4, [X20]	//X4 = *X20
+	ADD	X5, X3, X4	//X5 = X3(A) + X4(B)
+
+	//SUM OF C AND D
+	LDR	X3, [X21]	//X3 = *X21
+	LDR	X4, [X22]	//X4 = *X22
+	ADD	X6, X3, X4	//X6 = X3(C) + X4(D)
+
+	//SUBTRACTING C+D FROM A+B AND CONVERTING TO HEXSTRING
+	//X5 is holding A+B, X6 is holding C+D
+	SUB	X1, X5, X6	//X1 = X5 - X6
+	LDR	X0, =szTotal	//X0 = &szTotal
+	BL	hex64asc	//convert total into hexstring and store into szTotal
+	LDR	X0, =szTotal	//update address
+	MOV	X23, X0		//X23 = X0
+
+	//PRINTING szTotal
+	MOV	X0, X23		//X0 = X23
+	BL	putstring	//print szTotal
+	LDR	X0, =chCr	//X0 = &chCr
+	BL	putstring	//execute newline
+	LDR	X0, =chCr	//X0 = &chCr
+	BL 	putstring	//execute newline
+
+	//PRINTING ADDRESSES (HEADER)
+	LDR	X0, =szAddyPr	//X0 = &szAddyPr
+	BL	putstring	//print szAddyPr
+	LDR	X0, =chCr	//X0 = &chCr
+	BL	putstring	//execute newling
+
+	//CONVERT A ADDRESS TO HEXSTRING AND PRINT
+	LDR	X0, =szAa	//X0 = &szAa
+	MOV	X1, X19		//X1 = &qA
+	BL	hex64asc	//convert address to hexstring
+	LDR	X0, =szAa	//update address
+	BL	putstring	//print szAa
+	LDR	X0, =szSpace	//X0 = &szSpace
+	BL 	putstring	//execute space
+
+	//CONVERT B ADDRESS TO HEXSTRING AND PRINT
+        LDR     X0, =szAb       //X0 = &szAb
+        MOV     X1, X20         //X1 = &qB
+        BL      hex64asc        //convert address to hexstring
+        LDR     X0, =szAb       //update address
+        BL      putstring       //print szAb
+        LDR     X0, =szSpace    //X0 = &szSpace
+        BL      putstring       //execute space
+
+        //CONVERT C ADDRESS TO HEXSTRING AND PRINT
+        LDR     X0, =szAc       //X0 = &szAc
+        MOV     X1, X21         //X1 = &qC
+        BL      hex64asc        //convert address to hexstring
+        LDR     X0, =szAc       //update address
+        BL      putstring       //print szAc
+        LDR     X0, =szSpace    //X0 = &szSpace
+        BL      putstring       //execute space
+
+        //CONVERT D ADDRESS TO HEXSTRING AND PRINT
+        LDR     X0, =szAd       //X0 = &szAd
+        MOV     X1, X22         //X1 = &qD
+        BL      hex64asc        //convert address to hexstring
+        LDR     X0, =szAd       //update address
+        BL      putstring       //print szAb
+        LDR     X0, =chCr       //X0 = &chCr
+        BL      putstring       //execute newline
+        LDR     X0, =chCr       //X0 = &chCr
+        BL      putstring       //execute newline
 exit:
         //SETUP PARAMETERS TO EXIT PROGRAM AND THEN CALL
         //LINUX TO DO IT
